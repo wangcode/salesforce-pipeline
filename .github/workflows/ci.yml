@@ -10,7 +10,7 @@ on:
 # Jobs to be executed
 jobs:
     format-lint-lwc-tests:
-        runs-on: trailheadapps-Ubuntu
+        runs-on: Ubuntu
         steps:
             # Checkout the source code
             - name: 'Checkout source code'
@@ -49,7 +49,7 @@ jobs:
               run: npm run test:unit:coverage
 
     scratch-org-test:
-        runs-on: trailheadapps-Ubuntu
+        runs-on: Ubuntu
         needs: format-lint-lwc-tests
         steps:
             # Install Salesforce CLI
@@ -103,3 +103,21 @@ jobs:
             - name: 'Delete scratch org'
               if: always()
               run: sf org delete scratch -p -o scratch-org
+
+    build-package:
+        runs-on: Ubuntu
+        needs: scratch-org-test
+        steps:
+            # Install Salesforce CLI
+            - name: 'Install Salesforce CLI'
+              run: |
+                  npm install @salesforce/cli --location=global
+                  nodeInstallPath=$(npm config get prefix)
+                  echo "$nodeInstallPath/bin" >> $GITHUB_PATH
+                  sf --version
+
+            - name: "Convert source"
+              run: sf project convert source --root-dir ./force-app --output-dir ./release --package-name 'DreamHouse-${{github.run_id}}'
+
+            - name: "List"
+              run: ls ./release
