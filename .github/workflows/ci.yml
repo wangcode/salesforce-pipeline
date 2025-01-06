@@ -104,7 +104,7 @@ jobs:
               if: always()
               run: sf org delete scratch -p -o test-scratch-org
 
-    deploy-qa/uat/sit:
+    deploy-qa_uat_sit:
         runs-on: ubuntu-latest
         needs: scratch-org-test
         steps:
@@ -131,7 +131,7 @@ jobs:
 
     release-package-version:
         runs-on: ubuntu-latest
-        needs: scratch-org-test
+        needs: deploy-qa_uat_sit
         steps:
             # Checkout the source code
             - name: 'Checkout source code'
