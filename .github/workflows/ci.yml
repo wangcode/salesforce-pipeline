@@ -125,3 +125,22 @@ jobs:
 
             - name: "List"
               run: ls ./release
+
+    create-package-version:
+        runs-on: ubuntu-latest
+        needs: scratch-org-test
+        steps:
+            # Checkout the source code
+            - name: 'Checkout source code'
+              uses: actions/checkout@v4
+
+            # Install Salesforce CLI
+            - name: 'Install Salesforce CLI'
+              run: |
+                  npm install @salesforce/cli --location=global
+                  nodeInstallPath=$(npm config get prefix)
+                  echo "$nodeInstallPath/bin" >> $GITHUB_PATH
+                  sf --version
+
+            - name: "Convert source"
+              run: sf package version create -p 0HodL0000000kFlSAI -x -w 20 -f config/project-scratch-def.json --json
